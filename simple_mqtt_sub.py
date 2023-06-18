@@ -1,4 +1,6 @@
 import paho.mqtt.client as mqtt
+from datetime import datetime
+import json
 # from paho.mqtt.client import MQTTMessage
 
 # BROKER, PORT = "localhost", 1883
@@ -30,10 +32,12 @@ client.subscribe(MQTT_TOPIC)
 def on_message_callback(client, userdata, message):
     msg = message
     msg_data = str(msg.payload.decode("UTF-8"))
+    data = json.loads(msg_data)
+    output = f"At {data['datetime']} it was {data['temp']} at location {data['client']}"
+    print(f"{output}")
     print(f"Received: {msg_data}")
-    print(f"Topic:    {msg.topic}")
-    print(f"QoS:      {msg.qos}")
-    print(f"Retain:   {msg.retain}")
+    # print(f"        : {data} Type {type(data)}")
+    print(f"Topic: {msg.topic} QoS: {msg.qos} Retain: {msg.retain}")
 
 
 client.on_message = on_message_callback
