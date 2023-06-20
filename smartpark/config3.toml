@@ -7,4 +7,5 @@ name = 'display'
 location = 'Moondalup City Square Parking'
 total-spaces = 192
 total-cars = 0
+available_spaces = 192
 # TODO: finish this section of with relevant data maybe?

@@ -12,7 +12,7 @@ class CarPark(mqtt_device.MqttDevice):
         super().__init__(config['config'])
         self.total_spaces = config['config']['total-spaces']
         self.total_cars = config['config']['total-cars']
-        self._temperature = None
+        self._temperature = config['config']['temperature']
         self.client.on_message = self.on_message
         self.client.subscribe('sensor')
         self.client.loop_forever()
@@ -22,20 +22,27 @@ class CarPark(mqtt_device.MqttDevice):
         available = self.total_spaces - self.total_cars
         return max(available, 0)
 
+    @property
+    def temperature(self):
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        self._temperature = value
+
     def _publish_event(self):
         readable_time = datetime.now().strftime('%H:%M')
-        temperature = int(random.gauss(5, 35))
         print(
             (
                 f"TIME: {readable_time}, "
                 + f"SPACES: {self.available_spaces}, "
-                + f"TEMPC: {temperature}"
+                + f"TEMPC: {self.temperature} "
             )
         )
         message = (
             f"TIME: {readable_time}, "
             + f"SPACES: {self.available_spaces}, "
-            + f"TEMPC: {temperature}"
+            + f"TEMPC: {self.temperature}"
         )
         self.client.publish('display', message)
 
@@ -50,6 +57,9 @@ class CarPark(mqtt_device.MqttDevice):
     def on_message(self, client, userdata, msg: MQTTMessage):
         print("received message:", msg.topic, msg.payload.decode())
         payload = msg.payload.decode()
+        temperature_start_index = payload.index(', ') + len(', ')
+        temperature_end_index = payload.index(' degrees')
+        self.temperature = int(payload[temperature_start_index:temperature_end_index])
         if 'exited' in payload:
             self.on_car_exit()
         else:

@@ -54,6 +54,8 @@ class Display(mqtt_device.MqttDevice):
     fields = ['Available bays', 'Temperature', 'At']
 
     def __init__(self, config):
+        self.temperature = 0
+        self.available_spaces = 0
         super().__init__(config['config'])
         self.window = WindowedDisplay(
             'Moondalup', Display.fields)
@@ -73,25 +75,28 @@ class Display(mqtt_device.MqttDevice):
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode()
         self.display(*payload.split(','))
-        # TODO: Parse the message and extract free spaces,
-        #  temperature, time
+
+        start_index = payload.index('TEMPC: ') + len('TEMPC: ')
+        temperature = int(payload[start_index:])
+        self.temperature = temperature
+
+        start_index = payload.index('SPACES: ') + len('SPACES: ')
+        end_index = payload.index(',', start_index)
+        available_spaces = payload[start_index:end_index]
+        self.available_spaces = available_spaces
 
     def check_updates(self):
         self.client.on_message = self.on_message
         self.client.subscribe('display')
-        self.client.loop_forever()
-
+        self.client.loop_start()
         while True:
-            # NOTE: Dictionary keys *must* be the same as the class fields
             field_values = dict(zip(Display.fields, [
-                # TODO: change this so that it shows actual spaces and temp values
-                f'{random.randint(0, 150):03d}',
-                f'{random.randint(0, 45):02d}℃',
-                time.strftime("%H:%M:%S")]))
-            # Pretending to wait on updates from MQTT
-            time.sleep(random.randint(1, 10))
-            # When you get an update, refresh the display.
+                f'{int(self.available_spaces):03d}',
+                f'{int(self.temperature):02d}℃',
+                time.strftime("%H:%M")]))
+            time.sleep(2)
             self.window.update(field_values)
+            print(field_values)
 
 
 if __name__ == '__main__':

@@ -15,12 +15,16 @@ class Sensor(mqtt_device.MqttDevice):
     @property
     def temperature(self):
         """Returns the current temperature"""
-        return int(random.gauss(5, 35))
+        float_temp = int(random.gauss(22, 5))
+        int_temp = int(float_temp)
+        if int_temp < 0:
+            int_temp = int_temp * -1
+        return int_temp
+
 
     def on_detection(self, message):
         """Triggered when a detection occurs"""
         self.client.publish('sensor', message)
-        print(f"generated temperature: {self.temperature}")
 
     def start_sensing(self):
         """ A blocking event loop that waits for detection events, in this
@@ -29,11 +33,14 @@ class Sensor(mqtt_device.MqttDevice):
             print("Press E when 🚗 entered!")
             print("Press X when 🚖 exited!")
             detection = input("E or X> ").upper()
+            temperature = self.temperature
             if detection == 'E':
-                self.on_detection(f"entered, {self.temperature}")
+                self.on_detection(f"entered, {temperature} degrees")
+                print(f"{temperature}")
 
             else:
-                self.on_detection(f"exited, {self.temperature}")
+                self.on_detection(f"exited, {temperature} degrees")
+                print(f"{temperature}")
 
 
 if __name__ == '__main__':
