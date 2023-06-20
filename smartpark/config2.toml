@@ -1,0 +1,15 @@
+[config]
+broker = '127.0.0.1'
+port = 1883
+topic-root = 'carpark'
+topic-qualifier = 'controller'
+name = 'sensor'
+location = 'MOO'
+sensor = "entry"
+
+[sensor1]
+name = "entry"
+
+[MOO]
+name = "Moondalup City Square Parking"
+total-spaces = 192
