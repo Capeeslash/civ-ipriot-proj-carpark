@@ -1,13 +1,10 @@
-def get_config(filename: str = "config.toml") -> dict:
+
+
+def parse_config(filename: str = "config.toml") -> dict:
     import tomli
     with open(filename, mode="rb") as fp:
         config = tomli.load(fp)
     return config
-
-
-def parse_config(config: dict, section: str) -> dict:
-    the_config = config[section]
-    return the_config
 
 
 
