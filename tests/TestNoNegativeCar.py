@@ -30,16 +30,11 @@ class TestCarPark(unittest.TestCase):
         # Stop the MQTT client patcher
         self.patcher.stop()
 
-    def test_car_over_limit_entry(self):
-        self.car_park.total_spaces = 2
+    def test_no_negative_cars(self):
+        self.car_park.total_cars = 2
 
-        self.car_park.on_car_entry()
-        self.car_park.on_car_entry()
-        self.car_park.on_car_entry()
+        self.car_park.on_car_exit()
+        self.car_park.on_car_exit()
+        self.car_park.on_car_exit()
 
-
-        self.assertEqual(self.car_park.total_spaces, 2)
-        self.assertEqual(self.car_park.available_spaces, 0)
-
-
-
+        self.assertEqual(self.car_park.total_cars, 0)
