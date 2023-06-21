@@ -54,8 +54,13 @@ class Display(mqtt_device.MqttDevice):
     fields = ['Available bays', 'Temperature', 'At']
 
     def __init__(self, config):
-        self.temperature = 0
-        self.available_spaces = 0
+        float_temp = int(random.gauss(22, 5))
+        int_temp = int(float_temp)
+        if int_temp < 0:
+            int_temp = int_temp * -1
+
+        self.temperature = int_temp
+        self.available_spaces = 192
         super().__init__(config['config'])
         self.window = WindowedDisplay(
             'Moondalup', Display.fields)

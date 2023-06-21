@@ -10,9 +10,8 @@ class CarPark(mqtt_device.MqttDevice):
 
     def __init__(self, config):
         super().__init__(config)
-        self.total_spaces = config['total-spaces']
-        self.total_cars = config['total-cars']
-        self._temperature = config['temperature']
+        self.total_spaces = config['total_spaces']
+        self.total_cars = config['total_cars']
         self.client.on_message = self.on_message
         self.client.subscribe('sensor')
         self.client.loop_forever()
@@ -22,13 +21,6 @@ class CarPark(mqtt_device.MqttDevice):
         available = self.total_spaces - self.total_cars
         return max(available, 0)
 
-    @property
-    def temperature(self):
-        return self._temperature
-
-    @temperature.setter
-    def temperature(self, value):
-        self._temperature = value
 
     def _publish_event(self):
         readable_time = datetime.now().strftime('%H:%M')
@@ -36,13 +28,13 @@ class CarPark(mqtt_device.MqttDevice):
             (
                 f"TIME: {readable_time}, "
                 + f"SPACES: {self.available_spaces}, "
-                + f"TEMPC: {self.temperature} "
+
             )
         )
         message = (
             f"TIME: {readable_time}, "
             + f"SPACES: {self.available_spaces}, "
-            + f"TEMPC: {self.temperature}"
+
         )
         self.client.publish('display', message)
 
@@ -54,7 +46,7 @@ class CarPark(mqtt_device.MqttDevice):
             self._publish_event()
 
     def on_car_exit(self):
-        if self.total_cars <=0:
+        if self.total_cars <= 0:
             self.total_cars
         else:
             self.total_cars -= 1

@@ -1,8 +1,6 @@
 import unittest
-
 import tomli  # you can use toml, json,yaml, or ryo for your config file
-
-import smartpark.parse_config as pc
+from smartpark.config_parser import parse_config
 
 
 class TestConfigParsing(unittest.TestCase):
@@ -14,7 +12,7 @@ class TestConfigParsing(unittest.TestCase):
         broker_host = "localhost"
         broker_port = 1883
         '''
-        config = tomli.loads(config_string)
-        parking_lot = pc.parse_config(config)
-        self.assertEqual(parking_lot['location'], "Moondalup City Square Parking")
-        self.assertEqual(parking_lot['total_spaces'], 192)
+
+        config = parse_config('testconfig.toml')
+        self.assertEqual(config['location'], "Moondalup City Square Parking")
+        self.assertEqual(config['total_spaces'], 192)
